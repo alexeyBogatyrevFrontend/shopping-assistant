@@ -1,0 +1,46 @@
+import { createRouter, createWebHistory } from 'vue-router';
+
+const routes = [
+	{
+		path: '/',
+		name: 'home',
+		component: () => import('../pages/HomePage.vue'),
+	},
+	{
+		path: '/compare',
+		name: 'compare',
+		component: () => import('../pages/ComparePage.vue'),
+	},
+	{
+		path: '/favorites',
+		name: 'favorites',
+		component: () => import('../pages/FavoritesPage.vue'),
+	},
+	{
+		path: '/search',
+		name: 'search',
+		component: () => import('../pages/SearchPage.vue'),
+	},
+	{
+		path: '/products',
+		name: 'products',
+		component: () => import('../pages/ProductsPage.vue'),
+	},
+	{
+		path: '/products/:id',
+		name: 'product',
+		component: () => import('../pages/ProductPage.vue'),
+	},
+	{
+		path: '/:pathMatch(.*)*',
+		name: 'not-found',
+		component: () => import('../pages/NotFoundPage.vue'),
+	},
+];
+
+const router = createRouter({
+	history: createWebHistory(),
+	routes,
+});
+
+export default router;
