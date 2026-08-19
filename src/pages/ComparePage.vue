@@ -1,7 +1,11 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import BaseContainer from '../components/ui/BaseContainer.vue';
+</script>
 
 <template>
-	<div>Compare PAGE</div>
+	<BaseContainer>
+		<h1>COMPARE PAGE</h1>
+	</BaseContainer>
 </template>
 
 <style scoped></style>

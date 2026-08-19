@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { onMounted } from 'vue';
+import BaseContainer from '../components/ui/BaseContainer.vue';
 import ProductCard from '../components/product/ProductCard.vue';
 import { useProductsStore } from '../stores/products';
 
@@ -12,8 +13,14 @@ onMounted(() => {
 
 <template>
 	<main class="products-page">
-		<div class="products-page__container">
-			<h1 class="products-page__title">Products</h1>
+		<BaseContainer>
+			<div class="products-page__header">
+				<h1 class="products-page__title">Products</h1>
+
+				<span class="products-page__count">
+					{{ productsStore.total }} товаров
+				</span>
+			</div>
 
 			<p v-if="productsStore.loading" class="products-page__status">
 				Loading...
@@ -33,28 +40,31 @@ onMounted(() => {
 					:product="product"
 				/>
 			</div>
-		</div>
+		</BaseContainer>
 	</main>
 </template>
 
 <style scoped lang="scss">
 .products-page {
-	min-height: 100vh;
-	padding: 32px 16px;
-	background: var(--color-background);
+	min-height: 100%;
+	padding: 32px 0 48px;
 
-	&__container {
-		width: 100%;
-		max-width: var(--container-width);
-		margin: 0 auto;
+	&__header {
+		display: flex;
+		align-items: baseline;
+		gap: 12px;
+		margin-bottom: 24px;
 	}
 
 	&__title {
-		margin-bottom: 24px;
 		font-size: 32px;
 		font-weight: 700;
 		line-height: 1.2;
-		color: var(--color-text);
+	}
+
+	&__count {
+		font-size: 14px;
+		color: var(--color-text-secondary);
 	}
 
 	&__grid {
@@ -64,9 +74,8 @@ onMounted(() => {
 	}
 
 	&__status {
-		margin: 40px 0;
+		padding: 80px 0;
 		text-align: center;
-		font-size: 18px;
 		color: var(--color-text-secondary);
 
 		&--error {
@@ -88,10 +97,13 @@ onMounted(() => {
 	}
 
 	@media (max-width: 500px) {
-		padding: 20px 12px;
+		padding: 20px 0 32px;
+
+		&__header {
+			margin-bottom: 16px;
+		}
 
 		&__title {
-			margin-bottom: 16px;
 			font-size: 24px;
 		}
 
