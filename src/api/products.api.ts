@@ -11,3 +11,9 @@ export const getProducts = async (limit: number, skip: number) => {
 
 	return response.data;
 };
+
+export const getProduct = async (id: number) => {
+	const response = await api.get<Product>(`/products/${id}`);
+
+	return response.data;
+};

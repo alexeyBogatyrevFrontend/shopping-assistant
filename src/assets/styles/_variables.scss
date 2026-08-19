@@ -1,0 +1,23 @@
+// Breakpoints
+$breakpoint-mobile: 500px;
+$breakpoint-tablet: 800px;
+$breakpoint-desktop: 1000px;
+
+// Container
+$container-width: 1200px;
+
+// Border radius
+$radius-sm: 6px;
+$radius-md: 10px;
+$radius-lg: 14px;
+$radius-xl: 18px;
+
+// Shadows
+$shadow-sm: 0 2px 8px rgb(0 0 0 / 6%);
+$shadow-md: 0 6px 20px rgb(0 0 0 / 8%);
+$shadow-lg: 0 12px 32px rgb(0 0 0 / 10%);
+
+// Transitions
+$transition-fast: 0.15s ease;
+$transition-normal: 0.2s ease;
+$transition-slow: 0.3s ease;
