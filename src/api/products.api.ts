@@ -17,3 +17,22 @@ export const getProduct = async (id: number) => {
 
 	return response.data;
 };
+
+export const searchProducts = async (
+	query: string,
+	limit: number,
+	skip: number,
+) => {
+	const response = await api.get<PaginatedResponse<Product>>(
+		'/products/search',
+		{
+			params: {
+				q: query,
+				limit,
+				skip,
+			},
+		},
+	);
+
+	return response.data;
+};

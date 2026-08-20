@@ -17,11 +17,6 @@ const routes = [
 		component: () => import('../pages/FavoritesPage.vue'),
 	},
 	{
-		path: '/search',
-		name: 'search',
-		component: () => import('../pages/SearchPage.vue'),
-	},
-	{
 		path: '/products',
 		name: 'products',
 		component: () => import('../pages/ProductsPage.vue'),

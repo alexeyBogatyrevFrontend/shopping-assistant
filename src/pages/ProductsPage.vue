@@ -1,13 +1,41 @@
 <script setup lang="ts">
-import { onMounted } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import BaseContainer from '../components/ui/BaseContainer.vue';
 import ProductCard from '../components/product/ProductCard.vue';
 import { useProductsStore } from '../stores/products';
+import ProductSearch from '../components/product/ProductSearch.vue';
+
+import { useRoute, useRouter } from 'vue-router';
+import { useDebounceFn } from '@vueuse/core';
+
+const route = useRoute();
+const router = useRouter();
 
 const productsStore = useProductsStore();
 
+const searchQuery = ref(
+	typeof route.query.search === 'string' ? route.query.search : '',
+);
+
+const debouncedSearch = useDebounceFn((query: string) => {
+	productsStore.search(query, 12, 0);
+}, 500);
+
 onMounted(() => {
-	productsStore.fetchProducts(12, 0);
+	productsStore.search(searchQuery.value, 12, 0);
+});
+
+watch(searchQuery, value => {
+	const query = value.trim();
+
+	router.replace({
+		query: {
+			...route.query,
+			search: query || undefined,
+		},
+	});
+
+	debouncedSearch(query);
 });
 </script>
 
@@ -15,11 +43,17 @@ onMounted(() => {
 	<main class="products-page">
 		<BaseContainer>
 			<div class="products-page__header">
-				<h1 class="products-page__title">Products</h1>
+				<div>
+					<h1 class="products-page__title">Products</h1>
 
-				<span class="products-page__count">
-					{{ productsStore.total }} товаров
-				</span>
+					<span class="products-page__count">
+						{{ productsStore.total }} товаров
+					</span>
+				</div>
+
+				<div class="products-page__toolbar">
+					<ProductSearch v-model="searchQuery" />
+				</div>
 			</div>
 
 			<p v-if="productsStore.loading" class="products-page__status">
@@ -51,9 +85,10 @@ onMounted(() => {
 
 	&__header {
 		display: flex;
-		align-items: baseline;
 		gap: 12px;
 		margin-bottom: 24px;
+		justify-content: space-between;
+		align-items: center;
 	}
 
 	&__title {

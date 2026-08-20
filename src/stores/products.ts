@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import type { Product } from '../types/product';
-import { getProduct, getProducts } from '../api/products.api';
+import { getProduct, getProducts, searchProducts } from '../api/products.api';
 
 export const useProductsStore = defineStore('products', () => {
 	const products = ref<Product[]>([]);
@@ -50,6 +50,28 @@ export const useProductsStore = defineStore('products', () => {
 		}
 	};
 
+	const search = async (query: string, limit: number, skip: number) => {
+		loading.value = true;
+		error.value = null;
+
+		try {
+			const data = query.trim()
+				? await searchProducts(query, limit, skip)
+				: await getProducts(limit, skip);
+
+			products.value = data.products;
+			total.value = data.total;
+		} catch (err) {
+			if (err instanceof Error) {
+				error.value = err.message;
+			} else {
+				error.value = 'Неизвестная ошибка';
+			}
+		} finally {
+			loading.value = false;
+		}
+	};
+
 	return {
 		products,
 		product,
@@ -58,5 +80,6 @@ export const useProductsStore = defineStore('products', () => {
 		error,
 		fetchProducts,
 		fetchProduct,
+		search,
 	};
 });
