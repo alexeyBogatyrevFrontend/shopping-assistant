@@ -22,6 +22,7 @@ import AppHeader from '../components/app/AppHeader.vue';
 	min-height: 100vh;
 
 	&__main {
+		display: flex;
 		flex: 1;
 	}
 }

@@ -7,6 +7,7 @@ import ProductSearch from '../components/product/ProductSearch.vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useDebounceFn } from '@vueuse/core';
 import ProductList from '../components/product/ProductList.vue';
+import ProductPagination from '../components/product/ProductPagination.vue';
 
 const PRODUCTS_PER_PAGE = 12;
 
@@ -57,10 +58,12 @@ onMounted(() => {
 
 watch(searchQuery, value => {
 	const query = value.trim();
+	currentPage.value = 1;
 
 	router.replace({
 		query: {
 			...route.query,
+			page: 1,
 			search: query || undefined,
 		},
 	});
@@ -70,61 +73,56 @@ watch(searchQuery, value => {
 </script>
 
 <template>
-	<main class="products-page">
+	<div class="products-page">
 		<BaseContainer>
-			<div class="products-page__header">
-				<div>
-					<h1 class="products-page__title">Products</h1>
+			<div class="products-page__content">
+				<div class="products-page__header">
+					<div>
+						<h1 class="products-page__title">Products</h1>
 
-					<span class="products-page__count">
-						{{ productsStore.total }} товаров
-					</span>
+						<span class="products-page__count">
+							{{ productsStore.total }} товаров
+						</span>
+					</div>
+
+					<div class="products-page__toolbar">
+						<ProductSearch v-model="searchQuery" />
+					</div>
 				</div>
 
-				<div class="products-page__toolbar">
-					<ProductSearch v-model="searchQuery" />
-				</div>
-			</div>
+				<p v-if="productsStore.loading" class="products-page__status">
+					Loading...
+				</p>
 
-			<p v-if="productsStore.loading" class="products-page__status">
-				Loading...
-			</p>
-
-			<p
-				v-else-if="productsStore.error"
-				class="products-page__status products-page__status--error"
-			>
-				Error: {{ productsStore.error }}
-			</p>
-
-			<ProductList v-else :products="productsStore.products" />
-
-			<div class="products-page__pagination-test">
-				<button
-					:disabled="currentPage === 1"
-					@click="changePage(currentPage - 1)"
+				<p
+					v-else-if="productsStore.error"
+					class="products-page__status products-page__status--error"
 				>
-					Previous
-				</button>
+					Error: {{ productsStore.error }}
+				</p>
 
-				<span> Page {{ currentPage }} / {{ totalPages }} </span>
+				<ProductList v-else :products="productsStore.products" />
 
-				<button
-					:disabled="currentPage === totalPages"
-					@click="changePage(currentPage + 1)"
-				>
-					Next
-				</button>
+				<ProductPagination
+					:current-page="currentPage"
+					:total-pages="totalPages"
+					@change-page="changePage"
+				/>
 			</div>
 		</BaseContainer>
-	</main>
+	</div>
 </template>
 
 <style scoped lang="scss">
 .products-page {
-	min-height: 100%;
+	display: flex;
+	flex: 1;
 	padding: 32px 0 48px;
-
+	&__content {
+		display: flex;
+		flex-direction: column;
+		height: 100%;
+	}
 	&__header {
 		display: flex;
 		gap: 12px;
