@@ -1,12 +1,14 @@
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import BaseContainer from '../components/ui/BaseContainer.vue';
-import ProductCard from '../components/product/ProductCard.vue';
 import { useProductsStore } from '../stores/products';
 import ProductSearch from '../components/product/ProductSearch.vue';
 
 import { useRoute, useRouter } from 'vue-router';
 import { useDebounceFn } from '@vueuse/core';
+import ProductList from '../components/product/ProductList.vue';
+
+const PRODUCTS_PER_PAGE = 12;
 
 const route = useRoute();
 const router = useRouter();
@@ -16,13 +18,41 @@ const productsStore = useProductsStore();
 const searchQuery = ref(
 	typeof route.query.search === 'string' ? route.query.search : '',
 );
+const currentPage = ref(
+	typeof route.query.page === 'string' ? Number(route.query.page) : 1,
+);
+
+const loadProducts = (query = searchQuery.value) => {
+	productsStore.search(
+		query,
+		PRODUCTS_PER_PAGE,
+		(currentPage.value - 1) * PRODUCTS_PER_PAGE,
+	);
+};
+
+const changePage = (page: number) => {
+	currentPage.value = page;
+
+	router.replace({
+		query: {
+			...route.query,
+			page: page === 1 ? undefined : String(page),
+		},
+	});
+
+	loadProducts();
+};
 
 const debouncedSearch = useDebounceFn((query: string) => {
-	productsStore.search(query, 12, 0);
+	loadProducts(query);
 }, 500);
 
+const totalPages = computed(() => {
+	return Math.ceil(productsStore.total / PRODUCTS_PER_PAGE);
+});
+
 onMounted(() => {
-	productsStore.search(searchQuery.value, 12, 0);
+	loadProducts();
 });
 
 watch(searchQuery, value => {
@@ -67,12 +97,24 @@ watch(searchQuery, value => {
 				Error: {{ productsStore.error }}
 			</p>
 
-			<div v-else class="products-page__grid">
-				<ProductCard
-					v-for="product in productsStore.products"
-					:key="product.id"
-					:product="product"
-				/>
+			<ProductList v-else :products="productsStore.products" />
+
+			<div class="products-page__pagination-test">
+				<button
+					:disabled="currentPage === 1"
+					@click="changePage(currentPage - 1)"
+				>
+					Previous
+				</button>
+
+				<span> Page {{ currentPage }} / {{ totalPages }} </span>
+
+				<button
+					:disabled="currentPage === totalPages"
+					@click="changePage(currentPage + 1)"
+				>
+					Next
+				</button>
 			</div>
 		</BaseContainer>
 	</main>
@@ -102,12 +144,6 @@ watch(searchQuery, value => {
 		color: var(--color-text-secondary);
 	}
 
-	&__grid {
-		display: grid;
-		grid-template-columns: repeat(4, minmax(0, 1fr));
-		gap: 20px;
-	}
-
 	&__status {
 		padding: 80px 0;
 		text-align: center;
@@ -115,19 +151,6 @@ watch(searchQuery, value => {
 
 		&--error {
 			color: var(--color-error);
-		}
-	}
-
-	@media (max-width: 1000px) {
-		&__grid {
-			grid-template-columns: repeat(3, minmax(0, 1fr));
-		}
-	}
-
-	@media (max-width: 800px) {
-		&__grid {
-			grid-template-columns: repeat(2, minmax(0, 1fr));
-			gap: 16px;
 		}
 	}
 
@@ -140,10 +163,6 @@ watch(searchQuery, value => {
 
 		&__title {
 			font-size: 24px;
-		}
-
-		&__grid {
-			grid-template-columns: 1fr;
 		}
 	}
 }
