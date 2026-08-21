@@ -1,94 +1,20 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue';
 import BaseContainer from '../components/ui/BaseContainer.vue';
-import { useProductsStore } from '../stores/products';
-import ProductSearch from '../components/product/ProductSearch.vue';
 
-import { useRoute, useRouter } from 'vue-router';
-import { useDebounceFn } from '@vueuse/core';
 import ProductList from '../components/product/ProductList.vue';
 import ProductPagination from '../components/product/ProductPagination.vue';
+import ProductsToolbar from '../components/product/ProductsToolbar.vue';
+import { useProductsQuery } from '../composables/useProductsQuery.ts';
 
-const PRODUCTS_PER_PAGE = 12;
-
-const route = useRoute();
-const router = useRouter();
-
-const productsStore = useProductsStore();
-
-const searchQuery = ref(
-	typeof route.query.search === 'string' ? route.query.search : '',
-);
-const currentPage = ref(
-	typeof route.query.page === 'string' ? Number(route.query.page) : 1,
-);
-
-const loadProducts = (query = searchQuery.value) => {
-	productsStore.search(
-		query,
-		PRODUCTS_PER_PAGE,
-		(currentPage.value - 1) * PRODUCTS_PER_PAGE,
-	);
-};
-
-const changePage = (page: number) => {
-	currentPage.value = page;
-
-	router.replace({
-		query: {
-			...route.query,
-			page: page === 1 ? undefined : String(page),
-		},
-	});
-
-	loadProducts();
-};
-
-const debouncedSearch = useDebounceFn((query: string) => {
-	loadProducts(query);
-}, 500);
-
-const totalPages = computed(() => {
-	return Math.ceil(productsStore.total / PRODUCTS_PER_PAGE);
-});
-
-onMounted(() => {
-	loadProducts();
-});
-
-watch(searchQuery, value => {
-	const query = value.trim();
-	currentPage.value = 1;
-
-	router.replace({
-		query: {
-			...route.query,
-			page: 1,
-			search: query || undefined,
-		},
-	});
-
-	debouncedSearch(query);
-});
+const { searchQuery, currentPage, productsStore, totalPages, changePage } =
+	useProductsQuery();
 </script>
 
 <template>
 	<div class="products-page">
 		<BaseContainer>
 			<div class="products-page__content">
-				<div class="products-page__header">
-					<div>
-						<h1 class="products-page__title">Products</h1>
-
-						<span class="products-page__count">
-							{{ productsStore.total }} товаров
-						</span>
-					</div>
-
-					<div class="products-page__toolbar">
-						<ProductSearch v-model="searchQuery" />
-					</div>
-				</div>
+				<ProductsToolbar v-model="searchQuery" :total="productsStore.total" />
 
 				<p v-if="productsStore.loading" class="products-page__status">
 					Loading...
@@ -122,13 +48,6 @@ watch(searchQuery, value => {
 		display: flex;
 		flex-direction: column;
 		height: 100%;
-	}
-	&__header {
-		display: flex;
-		gap: 12px;
-		margin-bottom: 24px;
-		justify-content: space-between;
-		align-items: center;
 	}
 
 	&__title {
