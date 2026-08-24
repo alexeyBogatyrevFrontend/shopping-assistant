@@ -5,9 +5,18 @@ import ProductList from '../components/product/ProductList.vue';
 import ProductPagination from '../components/product/ProductPagination.vue';
 import ProductsToolbar from '../components/product/ProductsToolbar.vue';
 import { useProductsQuery } from '../composables/useProductsQuery.ts';
+import ProductCategoryFilter from '../components/product/ProductCategoryFilter.vue';
+import { useCategoriesStore } from '../stores/categories.ts';
 
-const { searchQuery, currentPage, productsStore, totalPages, changePage } =
-	useProductsQuery();
+const {
+	searchQuery,
+	selectedCategory,
+	currentPage,
+	productsStore,
+	categoriesStore,
+	totalPages,
+	changePage,
+} = useProductsQuery();
 </script>
 
 <template>
@@ -15,6 +24,11 @@ const { searchQuery, currentPage, productsStore, totalPages, changePage } =
 		<BaseContainer>
 			<div class="products-page__content">
 				<ProductsToolbar v-model="searchQuery" :total="productsStore.total" />
+
+				<ProductCategoryFilter
+					v-model="selectedCategory"
+					:categories="categoriesStore.categories"
+				/>
 
 				<p v-if="productsStore.loading" class="products-page__status">
 					Loading...

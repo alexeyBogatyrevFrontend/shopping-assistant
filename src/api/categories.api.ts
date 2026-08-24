@@ -8,9 +8,19 @@ export const getCategories = async () => {
 	return response.data;
 };
 
-export const getCategory = async (query: string) => {
+export const getProductsByCategory = async (
+	category: string,
+	limit: number,
+	skip: number,
+) => {
 	const response = await api.get<PaginatedResponse<Product>>(
-		`/products/category/${query}`,
+		`/products/category/${category}`,
+		{
+			params: {
+				limit,
+				skip,
+			},
+		},
 	);
 
 	return response.data;

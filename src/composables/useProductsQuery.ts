@@ -2,6 +2,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { useProductsStore } from '../stores/products';
 import { computed, onMounted, ref, watch } from 'vue';
 import { useDebounceFn } from '@vueuse/core';
+import { useCategoriesStore } from '../stores/categories';
 
 export const useProductsQuery = () => {
 	const PRODUCTS_PER_PAGE = 12;
@@ -10,6 +11,7 @@ export const useProductsQuery = () => {
 	const router = useRouter();
 
 	const productsStore = useProductsStore();
+	const categoriesStore = useCategoriesStore();
 
 	const searchQuery = ref(
 		typeof route.query.search === 'string' ? route.query.search : '',
@@ -17,13 +19,24 @@ export const useProductsQuery = () => {
 	const currentPage = ref(
 		typeof route.query.page === 'string' ? Number(route.query.page) : 1,
 	);
+	const selectedCategory = ref(
+		typeof route.query.category === 'string' ? route.query.category : '',
+	);
 
 	const loadProducts = (query = searchQuery.value) => {
-		productsStore.search(
-			query,
-			PRODUCTS_PER_PAGE,
-			(currentPage.value - 1) * PRODUCTS_PER_PAGE,
-		);
+		const skip = (currentPage.value - 1) * PRODUCTS_PER_PAGE;
+
+		if (selectedCategory.value) {
+			productsStore.fetchProductsByCategory(
+				selectedCategory.value,
+				PRODUCTS_PER_PAGE,
+				skip,
+			);
+
+			return;
+		}
+
+		productsStore.search(query, PRODUCTS_PER_PAGE, skip);
 	};
 
 	const changePage = (page: number) => {
@@ -49,6 +62,7 @@ export const useProductsQuery = () => {
 
 	onMounted(() => {
 		loadProducts();
+		categoriesStore.fetchCategories();
 	});
 
 	watch(searchQuery, value => {
@@ -66,11 +80,27 @@ export const useProductsQuery = () => {
 		debouncedSearch(query);
 	});
 
+	watch(selectedCategory, value => {
+		currentPage.value = 1;
+
+		router.replace({
+			query: {
+				...route.query,
+				page: undefined,
+				category: value || undefined,
+			},
+		});
+
+		loadProducts();
+	});
+
 	return {
 		searchQuery,
+		selectedCategory,
 		currentPage,
 		productsStore,
-		changePage,
+		categoriesStore,
 		totalPages,
+		changePage,
 	};
 };
