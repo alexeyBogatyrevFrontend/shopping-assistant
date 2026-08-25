@@ -6,7 +6,6 @@ import ProductPagination from '../components/product/ProductPagination.vue';
 import ProductsToolbar from '../components/product/ProductsToolbar.vue';
 import { useProductsQuery } from '../composables/useProductsQuery.ts';
 import ProductCategoryFilter from '../components/product/ProductCategoryFilter.vue';
-import { useCategoriesStore } from '../stores/categories.ts';
 
 const {
 	searchQuery,
