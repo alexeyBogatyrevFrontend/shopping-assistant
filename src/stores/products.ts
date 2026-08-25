@@ -1,8 +1,12 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import type { PaginatedResponse, Product } from '../types/product';
-import { getProduct, getProducts, searchProducts } from '../api/products.api';
-import { getProductsByCategory } from '../api/categories.api';
+import {
+	getProduct,
+	getProducts,
+	searchProducts,
+	getProductsByCategory,
+} from '../api/products.api';
 
 export const useProductsStore = defineStore('products', () => {
 	const products = ref<Product[]>([]);
@@ -45,10 +49,6 @@ export const useProductsStore = defineStore('products', () => {
 				loading.value = false;
 			}
 		}
-	};
-
-	const fetchProducts = (limit: number, skip: number) => {
-		return loadProductsList(() => getProducts(limit, skip));
 	};
 
 	const search = (query: string, limit: number, skip: number) => {
@@ -97,7 +97,7 @@ export const useProductsStore = defineStore('products', () => {
 		total,
 		loading,
 		error,
-		fetchProducts,
+
 		fetchProduct,
 		search,
 		fetchProductsByCategory,

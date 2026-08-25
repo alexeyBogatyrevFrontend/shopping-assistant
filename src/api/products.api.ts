@@ -36,3 +36,21 @@ export const searchProducts = async (
 
 	return response.data;
 };
+
+export const getProductsByCategory = async (
+	category: string,
+	limit: number,
+	skip: number,
+) => {
+	const response = await api.get<PaginatedResponse<Product>>(
+		`/products/category/${category}`,
+		{
+			params: {
+				limit,
+				skip,
+			},
+		},
+	);
+
+	return response.data;
+};
