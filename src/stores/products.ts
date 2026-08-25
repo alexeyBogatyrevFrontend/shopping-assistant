@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
-import type { Product } from '../types/product';
+import type { PaginatedResponse, Product } from '../types/product';
 import { getProduct, getProducts, searchProducts } from '../api/products.api';
 import { getProductsByCategory } from '../api/categories.api';
 
@@ -11,24 +11,64 @@ export const useProductsStore = defineStore('products', () => {
 	const loading = ref(false);
 	const error = ref<string | null>(null);
 
-	const fetchProducts = async (limit: number, skip: number) => {
+	let latestProductsRequestId = 0;
+
+	const loadProductsList = async (
+		request: () => Promise<PaginatedResponse<Product>>,
+	) => {
+		const requestId = ++latestProductsRequestId;
+
 		loading.value = true;
 		error.value = null;
 
 		try {
-			const data = await getProducts(limit, skip);
+			const data = await request();
+
+			if (requestId !== latestProductsRequestId) {
+				return;
+			}
 
 			products.value = data.products;
 			total.value = data.total;
 		} catch (err) {
+			if (requestId !== latestProductsRequestId) {
+				return;
+			}
+
 			if (err instanceof Error) {
 				error.value = err.message;
 			} else {
 				error.value = 'Неизвестная ошибка';
 			}
 		} finally {
-			loading.value = false;
+			if (requestId === latestProductsRequestId) {
+				loading.value = false;
+			}
 		}
+	};
+
+	const fetchProducts = (limit: number, skip: number) => {
+		return loadProductsList(() => getProducts(limit, skip));
+	};
+
+	const search = (query: string, limit: number, skip: number) => {
+		const normalizedQuery = query.trim();
+
+		return loadProductsList(() => {
+			if (normalizedQuery) {
+				return searchProducts(normalizedQuery, limit, skip);
+			}
+
+			return getProducts(limit, skip);
+		});
+	};
+
+	const fetchProductsByCategory = (
+		category: string,
+		limit: number,
+		skip: number,
+	) => {
+		return loadProductsList(() => getProductsByCategory(category, limit, skip));
 	};
 
 	const fetchProduct = async (id: number) => {
@@ -40,52 +80,6 @@ export const useProductsStore = defineStore('products', () => {
 			const data = await getProduct(id);
 
 			product.value = data;
-		} catch (err) {
-			if (err instanceof Error) {
-				error.value = err.message;
-			} else {
-				error.value = 'Неизвестная ошибка';
-			}
-		} finally {
-			loading.value = false;
-		}
-	};
-
-	const search = async (query: string, limit: number, skip: number) => {
-		loading.value = true;
-		error.value = null;
-
-		try {
-			const data = query.trim()
-				? await searchProducts(query, limit, skip)
-				: await getProducts(limit, skip);
-
-			products.value = data.products;
-			total.value = data.total;
-		} catch (err) {
-			if (err instanceof Error) {
-				error.value = err.message;
-			} else {
-				error.value = 'Неизвестная ошибка';
-			}
-		} finally {
-			loading.value = false;
-		}
-	};
-
-	const fetchProductsByCategory = async (
-		category: string,
-		limit: number,
-		skip: number,
-	) => {
-		loading.value = true;
-		error.value = null;
-
-		try {
-			const data = await getProductsByCategory(category, limit, skip);
-
-			products.value = data.products;
-			total.value = data.total;
 		} catch (err) {
 			if (err instanceof Error) {
 				error.value = err.message;

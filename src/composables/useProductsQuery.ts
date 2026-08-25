@@ -162,5 +162,6 @@ export const useProductsQuery = () => {
 		categoriesStore,
 		totalPages,
 		changePage,
+		loadProducts,
 	};
 };

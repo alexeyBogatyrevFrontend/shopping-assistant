@@ -1,10 +1,16 @@
 <script setup lang="ts">
 import type { Category } from '../../types/category';
 
-defineProps<{
-	categories: Category[];
-	modelValue: string;
-}>();
+withDefaults(
+	defineProps<{
+		categories: Category[];
+		modelValue: string;
+		disabled?: boolean;
+	}>(),
+	{
+		disabled: false,
+	},
+);
 
 const emit = defineEmits<{
 	'update:modelValue': [value: string];
@@ -19,6 +25,7 @@ const emit = defineEmits<{
 			<select
 				class="product-category-filter__select"
 				:value="modelValue"
+				:disabled="disabled"
 				@change="
 					emit('update:modelValue', ($event.target as HTMLSelectElement).value)
 				"
@@ -65,15 +72,21 @@ const emit = defineEmits<{
 		outline: none;
 		transition:
 			border-color var(--transition-fast),
-			box-shadow var(--transition-fast);
+			box-shadow var(--transition-fast),
+			opacity var(--transition-fast);
 
-		&:hover {
+		&:hover:not(:disabled) {
 			border-color: var(--color-border-hover);
 		}
 
 		&:focus {
 			border-color: var(--color-primary);
 			box-shadow: 0 0 0 3px rgb(37 99 235 / 10%);
+		}
+
+		&:disabled {
+			cursor: not-allowed;
+			opacity: 0.6;
 		}
 	}
 
