@@ -55,7 +55,7 @@ const emptyMessage = computed(() => {
 					v-else-if="categoriesStore.error"
 					class="products-page__category-status products-page__category-status--error"
 				>
-					<span> Не удалось загрузить категории </span>
+					<span> {{ categoriesStore.error.message }} </span>
 
 					<button
 						type="button"
@@ -66,15 +66,17 @@ const emptyMessage = computed(() => {
 					</button>
 				</div>
 
-				<p v-if="productsStore.loading" class="products-page__status">
+				<p v-if="productsStore.productsLoading" class="products-page__status">
 					Загрузка товаров...
 				</p>
 
 				<div
-					v-else-if="productsStore.error"
+					v-else-if="productsStore.productsError"
 					class="products-page__status products-page__status--error"
 				>
-					<p>Не удалось загрузить товары</p>
+					<p>
+						{{ productsStore.productsError.message }}
+					</p>
 
 					<button
 						type="button"
@@ -96,8 +98,8 @@ const emptyMessage = computed(() => {
 
 				<ProductPagination
 					v-if="
-						!productsStore.loading &&
-						!productsStore.error &&
+						!productsStore.productsLoading &&
+						!productsStore.productsError &&
 						productsStore.products.length > 0
 					"
 					:current-page="currentPage"
@@ -114,21 +116,11 @@ const emptyMessage = computed(() => {
 	display: flex;
 	flex: 1;
 	padding: 32px 0 48px;
+
 	&__content {
 		display: flex;
 		flex-direction: column;
 		height: 100%;
-	}
-
-	&__title {
-		font-size: 32px;
-		font-weight: 700;
-		line-height: 1.2;
-	}
-
-	&__count {
-		font-size: 14px;
-		color: var(--color-text-secondary);
 	}
 
 	&__status {
@@ -177,14 +169,6 @@ const emptyMessage = computed(() => {
 
 	@media (max-width: 500px) {
 		padding: 20px 0 32px;
-
-		&__header {
-			margin-bottom: 16px;
-		}
-
-		&__title {
-			font-size: 24px;
-		}
 	}
 }
 </style>

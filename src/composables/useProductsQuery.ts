@@ -144,6 +144,33 @@ export const useProductsQuery = () => {
 		},
 	);
 
+	watch(
+		[
+			() => productsStore.productsLoading,
+			() => productsStore.productsError,
+			totalPages,
+			currentPage,
+		],
+		([loading, error, pages, page]) => {
+			if (loading || error) {
+				return;
+			}
+
+			const lastPage = Math.max(pages, 1);
+
+			if (page <= lastPage) {
+				return;
+			}
+
+			router.replace({
+				query: {
+					...route.query,
+					page: lastPage === 1 ? undefined : String(lastPage),
+				},
+			});
+		},
+	);
+
 	onMounted(() => {
 		categoriesStore.fetchCategories();
 	});

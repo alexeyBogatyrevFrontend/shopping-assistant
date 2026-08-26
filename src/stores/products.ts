@@ -7,23 +7,28 @@ import {
 	searchProducts,
 	getProductsByCategory,
 } from '../api/products.api';
+import { getRequestError, type RequestError } from '../api/error';
 
 export const useProductsStore = defineStore('products', () => {
 	const products = ref<Product[]>([]);
-	const product = ref<Product | null>(null);
 	const total = ref(0);
-	const loading = ref(false);
-	const error = ref<string | null>(null);
+	const productsLoading = ref(false);
+	const productsError = ref<RequestError | null>(null);
+
+	const product = ref<Product | null>(null);
+	const productLoading = ref(false);
+	const productError = ref<RequestError | null>(null);
 
 	let latestProductsRequestId = 0;
+	let latestProductRequestId = 0;
 
 	const loadProductsList = async (
 		request: () => Promise<PaginatedResponse<Product>>,
 	) => {
 		const requestId = ++latestProductsRequestId;
 
-		loading.value = true;
-		error.value = null;
+		productsLoading.value = true;
+		productsError.value = null;
 
 		try {
 			const data = await request();
@@ -39,14 +44,10 @@ export const useProductsStore = defineStore('products', () => {
 				return;
 			}
 
-			if (err instanceof Error) {
-				error.value = err.message;
-			} else {
-				error.value = 'Неизвестная ошибка';
-			}
+			productsError.value = getRequestError(err);
 		} finally {
 			if (requestId === latestProductsRequestId) {
-				loading.value = false;
+				productsLoading.value = false;
 			}
 		}
 	};
@@ -72,33 +73,53 @@ export const useProductsStore = defineStore('products', () => {
 	};
 
 	const fetchProduct = async (id: number) => {
-		loading.value = true;
-		error.value = null;
+		const requestId = ++latestProductRequestId;
+
+		productLoading.value = true;
+		productError.value = null;
 		product.value = null;
 
 		try {
 			const data = await getProduct(id);
 
+			if (requestId !== latestProductRequestId) {
+				return;
+			}
+
 			product.value = data;
 		} catch (err) {
-			if (err instanceof Error) {
-				error.value = err.message;
-			} else {
-				error.value = 'Неизвестная ошибка';
+			if (requestId !== latestProductRequestId) {
+				return;
 			}
+
+			productError.value = getRequestError(err);
 		} finally {
-			loading.value = false;
+			if (requestId === latestProductRequestId) {
+				productLoading.value = false;
+			}
 		}
+	};
+
+	const resetProduct = () => {
+		latestProductRequestId++;
+
+		product.value = null;
+		productLoading.value = false;
+		productError.value = null;
 	};
 
 	return {
 		products,
-		product,
 		total,
-		loading,
-		error,
+		productsLoading,
+		productsError,
+
+		product,
+		productLoading,
+		productError,
 
 		fetchProduct,
+		resetProduct,
 		search,
 		fetchProductsByCategory,
 	};

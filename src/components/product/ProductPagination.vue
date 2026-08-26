@@ -15,35 +15,54 @@ const emit = defineEmits<{
 </script>
 
 <template>
-	<nav v-if="totalPages > 1" class="product-pagination">
+	<nav
+		v-if="totalPages > 1"
+		class="product-pagination"
+		aria-label="Пагинация товаров"
+	>
 		<button
+			type="button"
 			class="product-pagination__button"
-			:disabled="currentPage === 1"
+			:disabled="currentPage <= 1"
+			aria-label="Перейти на первую страницу"
 			@click="emit('changePage', 1)"
 		>
-			<BackwardIcon />
+			<BackwardIcon aria-hidden="true" />
 		</button>
+
 		<button
+			type="button"
 			class="product-pagination__button"
-			:disabled="currentPage === 1"
+			:disabled="currentPage <= 1"
+			aria-label="Перейти на предыдущую страницу"
 			@click="emit('changePage', currentPage - 1)"
 		>
-			<ArrowLeft />
+			<ArrowLeft aria-hidden="true" />
 		</button>
-		<span>Page {{ currentPage }} / {{ totalPages }}</span>
+
+		<span class="product-pagination__info" aria-live="polite">
+			Страница {{ currentPage }} из
+			{{ totalPages }}
+		</span>
+
 		<button
+			type="button"
 			class="product-pagination__button"
-			:disabled="currentPage === totalPages"
+			:disabled="currentPage >= totalPages"
+			aria-label="Перейти на следующую страницу"
 			@click="emit('changePage', currentPage + 1)"
 		>
-			<ArrowRight />
+			<ArrowRight aria-hidden="true" />
 		</button>
+
 		<button
+			type="button"
 			class="product-pagination__button"
-			:disabled="currentPage === totalPages"
+			:disabled="currentPage >= totalPages"
+			aria-label="Перейти на последнюю страницу"
 			@click="emit('changePage', totalPages)"
 		>
-			<NextIcon />
+			<NextIcon aria-hidden="true" />
 		</button>
 	</nav>
 </template>
@@ -93,6 +112,23 @@ const emit = defineEmits<{
 	&__info {
 		font-size: 14px;
 		color: var(--color-text-secondary);
+	}
+
+	@media (max-width: 600px) {
+		flex-wrap: wrap;
+		gap: 10px;
+
+		&__button {
+			width: 42px;
+			height: 38px;
+			padding: 0 12px;
+		}
+
+		&__info {
+			order: -1;
+			width: 100%;
+			text-align: center;
+		}
 	}
 }
 </style>

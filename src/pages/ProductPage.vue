@@ -1,30 +1,90 @@
 <script setup lang="ts">
+import { computed, watch } from 'vue';
 import { useRoute } from 'vue-router';
+
+import BaseButton from '../components/ui/BaseButton.vue';
 import { useProductsStore } from '../stores/products';
-import { onMounted } from 'vue';
 
 const route = useRoute();
 const productsStore = useProductsStore();
 
-onMounted(() => {
-	const id = Number(route.params.id);
+const productId = computed(() => {
+	const value = route.params.id;
 
-	productsStore.fetchProduct(id);
+	if (typeof value !== 'string') {
+		return null;
+	}
+
+	const id = Number(value);
+
+	if (!Number.isInteger(id) || id < 1) {
+		return null;
+	}
+
+	return id;
 });
+
+const invalidProductId = computed(() => {
+	return productId.value === null;
+});
+
+const loadProduct = () => {
+	if (productId.value === null) {
+		productsStore.resetProduct();
+		return;
+	}
+
+	return productsStore.fetchProduct(productId.value);
+};
+
+const productNotFound = computed(() => {
+	return productsStore.productError?.status === 404;
+});
+
+watch(
+	productId,
+	() => {
+		loadProduct();
+	},
+	{
+		immediate: true,
+	},
+);
 </script>
 
 <template>
 	<main class="product-page">
 		<div class="product-page__container">
-			<div v-if="productsStore.loading" class="product-page__status">
-				Loading...
+			<div v-if="productsStore.productLoading" class="product-page__status">
+				Загрузка товара...
 			</div>
 
 			<div
-				v-else-if="productsStore.error"
+				v-else-if="invalidProductId"
 				class="product-page__status product-page__status--error"
 			>
-				Error - {{ productsStore.error }}
+				Некорректный идентификатор товара
+			</div>
+
+			<div v-else-if="productNotFound" class="product-page__status">
+				<p>Товар не найден</p>
+
+				<RouterLink :to="{ name: 'products' }">
+					<BaseButton variant="secondary"> Вернуться к товарам </BaseButton>
+				</RouterLink>
+			</div>
+
+			<div
+				v-else-if="productsStore.productError"
+				class="product-page__status product-page__status--error"
+			>
+				<p>
+					{{ productsStore.productError.message }}
+				</p>
+
+				<BaseButton variant="secondary" @click="loadProduct">
+					Повторить
+				</BaseButton>
 			</div>
 
 			<article v-else-if="productsStore.product" class="product">
@@ -77,11 +137,18 @@ onMounted(() => {
 	}
 
 	&__status {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 16px;
 		padding: 80px 0;
 		text-align: center;
 		font-size: 18px;
 		color: var(--color-text-secondary);
-
+		position: fixed;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
 		&--error {
 			color: var(--color-error);
 		}
