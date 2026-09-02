@@ -1,16 +1,25 @@
 import { defineStore } from 'pinia';
+import { ref } from 'vue';
 
 import type { Category } from '../types/category';
-import { getCategories } from '../api/categories.api';
-import { ref } from 'vue';
 import { getRequestError, type RequestError } from '../api/error';
+import { getCategories } from '../api/categories.api';
 
 export const useCategoriesStore = defineStore('categories', () => {
 	const categories = ref<Category[]>([]);
 	const loading = ref(false);
 	const error = ref<RequestError | null>(null);
+	const loaded = ref(false);
 
-	const fetchCategories = async () => {
+	const fetchCategories = async (force = false) => {
+		if (loading.value) {
+			return;
+		}
+
+		if (loaded.value && !force) {
+			return;
+		}
+
 		loading.value = true;
 		error.value = null;
 
@@ -18,6 +27,7 @@ export const useCategoriesStore = defineStore('categories', () => {
 			const data = await getCategories();
 
 			categories.value = data;
+			loaded.value = true;
 		} catch (err) {
 			error.value = getRequestError(err);
 		} finally {
@@ -25,5 +35,11 @@ export const useCategoriesStore = defineStore('categories', () => {
 		}
 	};
 
-	return { categories, loading, error, fetchCategories };
+	return {
+		categories,
+		loading,
+		error,
+		loaded,
+		fetchCategories,
+	};
 });
