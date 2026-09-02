@@ -55,6 +55,13 @@ export type ProductSortField = 'title' | 'price' | 'rating';
 
 export type SortOrder = 'asc' | 'desc';
 
+export type ProductSortValue =
+	| ''
+	| 'price-asc'
+	| 'price-desc'
+	| 'rating-desc'
+	| 'title-asc';
+
 export interface ProductsRequestParams {
 	limit: number;
 	skip: number;

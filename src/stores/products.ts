@@ -1,6 +1,10 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
-import type { PaginatedResponse, Product } from '../types/product';
+import type {
+	PaginatedResponse,
+	Product,
+	ProductsRequestParams,
+} from '../types/product';
 import {
 	getProduct,
 	getProducts,
@@ -52,15 +56,10 @@ export const useProductsStore = defineStore('products', () => {
 		}
 	};
 
-	const search = (query: string, limit: number, skip: number) => {
+	const search = (query: string, params: ProductsRequestParams) => {
 		const normalizedQuery = query.trim();
 
 		return loadProductsList(() => {
-			const params = {
-				limit,
-				skip,
-			};
-
 			if (normalizedQuery) {
 				return searchProducts(normalizedQuery, params);
 			}
@@ -71,12 +70,9 @@ export const useProductsStore = defineStore('products', () => {
 
 	const fetchProductsByCategory = (
 		category: string,
-		limit: number,
-		skip: number,
+		params: ProductsRequestParams,
 	) => {
-		return loadProductsList(() =>
-			getProductsByCategory(category, { limit, skip }),
-		);
+		return loadProductsList(() => getProductsByCategory(category, params));
 	};
 
 	const fetchProduct = async (id: number) => {

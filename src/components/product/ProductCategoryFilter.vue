@@ -20,7 +20,7 @@ const emit = defineEmits<{
 <template>
 	<div class="product-category-filter">
 		<label class="product-category-filter__label">
-			Category
+			Категория
 
 			<select
 				class="product-category-filter__select"
@@ -30,7 +30,7 @@ const emit = defineEmits<{
 					emit('update:modelValue', ($event.target as HTMLSelectElement).value)
 				"
 			>
-				<option value="">All Categories</option>
+				<option value="">Все категории</option>
 
 				<option
 					v-for="category in categories"
@@ -48,7 +48,6 @@ const emit = defineEmits<{
 .product-category-filter {
 	display: flex;
 	align-items: center;
-	margin-bottom: 24px;
 
 	&__label {
 		display: flex;

@@ -7,6 +7,7 @@ import ProductsToolbar from '../components/product/ProductsToolbar.vue';
 import { useProductsQuery } from '../composables/useProductsQuery.ts';
 import ProductCategoryFilter from '../components/product/ProductCategoryFilter.vue';
 import { computed } from 'vue';
+import ProductSort from '../components/product/ProductSort.vue';
 
 const {
 	searchQuery,
@@ -17,6 +18,7 @@ const {
 	totalPages,
 	changePage,
 	loadProducts,
+	selectedSort,
 } = useProductsQuery();
 
 const emptyMessage = computed(() => {
@@ -38,11 +40,20 @@ const emptyMessage = computed(() => {
 			<div class="products-page__content">
 				<ProductsToolbar v-model="searchQuery" :total="productsStore.total" />
 
-				<ProductCategoryFilter
-					v-model="selectedCategory"
-					:categories="categoriesStore.categories"
-					:disabled="categoriesStore.loading || Boolean(categoriesStore.error)"
-				/>
+				<div class="products-page__controls">
+					<ProductCategoryFilter
+						v-model="selectedCategory"
+						:categories="categoriesStore.categories"
+						:disabled="
+							categoriesStore.loading || Boolean(categoriesStore.error)
+						"
+					/>
+
+					<ProductSort
+						v-model="selectedSort"
+						:disabled="productsStore.productsLoading"
+					/>
+				</div>
 
 				<p
 					v-if="categoriesStore.loading"
@@ -116,6 +127,21 @@ const emptyMessage = computed(() => {
 	display: flex;
 	flex: 1;
 	padding: 32px 0 48px;
+
+	&__controls {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 16px;
+		margin-bottom: 24px;
+	}
+
+	@media (max-width: 600px) {
+		&__controls {
+			flex-direction: column;
+			align-items: stretch;
+		}
+	}
 
 	&__content {
 		display: flex;
