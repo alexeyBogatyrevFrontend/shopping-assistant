@@ -1,12 +1,13 @@
-import type { PaginatedResponse, Product } from '../types/product';
+import type {
+	PaginatedResponse,
+	Product,
+	ProductsRequestParams,
+} from '../types/product';
 import { api } from './axios';
 
-export const getProducts = async (limit: number, skip: number) => {
+export const getProducts = async (params: ProductsRequestParams) => {
 	const response = await api.get<PaginatedResponse<Product>>('/products', {
-		params: {
-			limit,
-			skip,
-		},
+		params,
 	});
 
 	return response.data;
@@ -20,16 +21,14 @@ export const getProduct = async (id: number) => {
 
 export const searchProducts = async (
 	query: string,
-	limit: number,
-	skip: number,
+	params: ProductsRequestParams,
 ) => {
 	const response = await api.get<PaginatedResponse<Product>>(
 		'/products/search',
 		{
 			params: {
 				q: query,
-				limit,
-				skip,
+				...params,
 			},
 		},
 	);
@@ -39,16 +38,12 @@ export const searchProducts = async (
 
 export const getProductsByCategory = async (
 	category: string,
-	limit: number,
-	skip: number,
+	params: ProductsRequestParams,
 ) => {
 	const response = await api.get<PaginatedResponse<Product>>(
 		`/products/category/${category}`,
 		{
-			params: {
-				limit,
-				skip,
-			},
+			params,
 		},
 	);
 

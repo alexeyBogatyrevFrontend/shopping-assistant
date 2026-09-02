@@ -56,11 +56,16 @@ export const useProductsStore = defineStore('products', () => {
 		const normalizedQuery = query.trim();
 
 		return loadProductsList(() => {
+			const params = {
+				limit,
+				skip,
+			};
+
 			if (normalizedQuery) {
-				return searchProducts(normalizedQuery, limit, skip);
+				return searchProducts(normalizedQuery, params);
 			}
 
-			return getProducts(limit, skip);
+			return getProducts(params);
 		});
 	};
 
@@ -69,7 +74,9 @@ export const useProductsStore = defineStore('products', () => {
 		limit: number,
 		skip: number,
 	) => {
-		return loadProductsList(() => getProductsByCategory(category, limit, skip));
+		return loadProductsList(() =>
+			getProductsByCategory(category, { limit, skip }),
+		);
 	};
 
 	const fetchProduct = async (id: number) => {

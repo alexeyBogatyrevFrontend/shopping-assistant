@@ -50,3 +50,14 @@ export interface PaginatedResponse<T> {
 	skip: number;
 	limit: number;
 }
+
+export type ProductSortField = 'title' | 'price' | 'rating';
+
+export type SortOrder = 'asc' | 'desc';
+
+export interface ProductsRequestParams {
+	limit: number;
+	skip: number;
+	sortBy?: ProductSortField;
+	order?: SortOrder;
+}
