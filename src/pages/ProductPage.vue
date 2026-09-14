@@ -4,9 +4,12 @@ import { useRoute } from 'vue-router';
 
 import BaseButton from '../components/ui/BaseButton.vue';
 import { useProductsStore } from '../stores/products';
+import { useFavoritesStore } from '../stores/favorites.ts';
+import FavoriteButton from '../components/favorite/FavoriteButton.vue';
 
 const route = useRoute();
 const productsStore = useProductsStore();
+const favoritesStore = useFavoritesStore();
 
 const productId = computed(() => {
 	const value = route.params.id;
@@ -28,6 +31,14 @@ const invalidProductId = computed(() => {
 	return productId.value === null;
 });
 
+const currentProductIsFavorite = computed(() => {
+	if (!productsStore.product) {
+		return false;
+	}
+
+	return favoritesStore.isFavorite(productsStore.product.id);
+});
+
 const loadProduct = () => {
 	if (productId.value === null) {
 		productsStore.resetProduct();
@@ -40,6 +51,12 @@ const loadProduct = () => {
 const productNotFound = computed(() => {
 	return productsStore.productError?.status === 404;
 });
+
+const toggleCurrentProductFavorite = () => {
+	if (!productsStore.product) return;
+
+	favoritesStore.toggleFavorite(productsStore.product);
+};
 
 watch(
 	productId,
@@ -118,6 +135,12 @@ watch(
 					<div class="product__stock">
 						{{ productsStore.product.availabilityStatus }}
 					</div>
+
+					<FavoriteButton
+						class="product__favorite"
+						:is-favorite="currentProductIsFavorite"
+						@toggle="toggleCurrentProductFavorite"
+					/>
 				</div>
 			</article>
 		</div>
@@ -164,7 +187,9 @@ watch(
 	border: 1px solid var(--color-border);
 	border-radius: var(--radius-lg);
 	box-shadow: var(--shadow-sm);
-
+	&__favorite {
+		margin-top: 24px;
+	}
 	&__image-wrapper {
 		display: flex;
 		align-items: center;
