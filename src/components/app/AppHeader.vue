@@ -1,5 +1,8 @@
 <script setup lang="ts">
+import { useFavoritesStore } from '../../stores/favorites.ts';
 import BaseContainer from '../ui/BaseContainer.vue';
+
+const favoritesStore = useFavoritesStore();
 </script>
 
 <template>
@@ -13,19 +16,35 @@ import BaseContainer from '../ui/BaseContainer.vue';
 
 				<nav class="app-header__nav">
 					<RouterLink class="app-header__link" :to="{ name: 'home' }">
-						Home
+						Главная
 					</RouterLink>
 
 					<RouterLink class="app-header__link" :to="{ name: 'products' }">
-						Products
+						Товары
 					</RouterLink>
 
-					<RouterLink class="app-header__link" :to="{ name: 'favorites' }">
-						Favorites
+					<RouterLink
+						class="app-header__link"
+						:to="{ name: 'favorites' }"
+						:aria-label="
+							favoritesStore.favoritesCount > 0
+								? `Избранное: ${favoritesStore.favoritesCount}`
+								: 'Избранное'
+						"
+					>
+						<span>Favorites</span>
+
+						<span
+							v-if="favoritesStore.favoritesCount > 0"
+							class="app-header__badge"
+							aria-hidden="true"
+						>
+							{{ favoritesStore.favoritesCount }}
+						</span>
 					</RouterLink>
 
 					<RouterLink class="app-header__link" :to="{ name: 'compare' }">
-						Compare
+						Сравнить
 					</RouterLink>
 				</nav>
 			</div>
@@ -77,6 +96,9 @@ import BaseContainer from '../ui/BaseContainer.vue';
 		transition:
 			background-color var(--transition-fast),
 			color var(--transition-fast);
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
 
 		&:hover {
 			background: var(--color-background);
@@ -87,6 +109,21 @@ import BaseContainer from '../ui/BaseContainer.vue';
 			background: rgb(37 99 235 / 10%);
 			color: var(--color-primary);
 		}
+	}
+
+	&__badge {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		min-width: 20px;
+		height: 20px;
+		padding: 0 6px;
+		border-radius: 999px;
+		background: var(--color-error);
+		color: #fff;
+		font-size: 11px;
+		font-weight: 700;
+		line-height: 1;
 	}
 
 	@media (max-width: 700px) {
