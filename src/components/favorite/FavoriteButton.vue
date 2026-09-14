@@ -1,7 +1,13 @@
 <script setup lang="ts">
-defineProps<{
-	isFavorite: boolean;
-}>();
+withDefaults(
+	defineProps<{
+		isFavorite: boolean;
+		compact?: boolean;
+	}>(),
+	{
+		compact: false,
+	},
+);
 
 const emit = defineEmits<{
 	toggle: [];
@@ -14,6 +20,7 @@ const emit = defineEmits<{
 		class="favorite-button"
 		:class="{
 			'favorite-button--active': isFavorite,
+			'favorite-button--compact': compact,
 		}"
 		:aria-pressed="isFavorite"
 		:aria-label="isFavorite ? 'Удалить из избранного' : 'Добавить в избранное'"
@@ -23,7 +30,7 @@ const emit = defineEmits<{
 			{{ isFavorite ? '♥' : '♡' }}
 		</span>
 
-		<span class="favorite-button__text">
+		<span v-if="!compact" class="favorite-button__text">
 			{{ isFavorite ? 'В избранном' : 'Добавить в избранное' }}
 		</span>
 	</button>
@@ -58,6 +65,17 @@ const emit = defineEmits<{
 	&:focus-visible {
 		outline: 3px solid rgb(37 99 235 / 20%);
 		outline-offset: 2px;
+	}
+
+	&--compact {
+		width: 40px;
+		height: 40px;
+		min-height: 40px;
+		padding: 0;
+		border-radius: 50%;
+		background: rgb(255 255 255 / 92%);
+		box-shadow: var(--shadow-sm);
+		backdrop-filter: blur(6px);
 	}
 
 	&--active {

@@ -1,22 +1,43 @@
 <script setup lang="ts">
+import { computed } from 'vue';
+
+import FavoriteButton from '../favorite/FavoriteButton.vue';
+import { useFavoritesStore } from '../../stores/favorites';
 import type { Product } from '../../types/product';
 
-defineProps<{
+const props = defineProps<{
 	product: Product;
 }>();
+
+const favoritesStore = useFavoritesStore();
+
+const productIsFavorite = computed(() => {
+	return favoritesStore.isFavorite(props.product.id);
+});
+
+const toggleFavorite = () => {
+	favoritesStore.toggleFavorite(props.product);
+};
 </script>
 
 <template>
-	<RouterLink
-		class="product-card-link"
-		:to="{ name: 'product', params: { id: product.id } }"
-	>
-		<article class="product-card">
+	<article class="product-card">
+		<RouterLink
+			class="product-card__link"
+			:to="{
+				name: 'product',
+				params: {
+					id: product.id,
+				},
+			}"
+			:aria-label="`Открыть товар ${product.title}`"
+		>
 			<div class="product-card__image-wrapper">
 				<img
 					class="product-card__image"
 					:src="product.thumbnail"
 					:alt="product.title"
+					loading="lazy"
 				/>
 			</div>
 
@@ -26,24 +47,28 @@ defineProps<{
 				</h3>
 
 				<div class="product-card__rating">
-					<span>★</span>
+					<span aria-hidden="true"> ★ </span>
+
 					{{ product.rating }}
 				</div>
 
 				<span class="product-card__price"> ${{ product.price }} </span>
 			</div>
-		</article>
-	</RouterLink>
+		</RouterLink>
+
+		<FavoriteButton
+			class="product-card__favorite"
+			:is-favorite="productIsFavorite"
+			compact
+			@toggle="toggleFavorite"
+		/>
+	</article>
 </template>
 
 <style scoped lang="scss">
-.product-card-link {
-	display: block;
-	color: inherit;
-	text-decoration: none;
-}
-
 .product-card {
+	position: relative;
+
 	display: flex;
 	flex-direction: column;
 	height: 100%;
@@ -58,6 +83,27 @@ defineProps<{
 	&:hover {
 		transform: translateY(-2px);
 		box-shadow: var(--shadow-md);
+	}
+
+	&__link {
+		display: flex;
+		flex: 1;
+		flex-direction: column;
+		height: 100%;
+		color: inherit;
+		text-decoration: none;
+
+		&:focus-visible {
+			outline: 3px solid rgb(37 99 235 / 20%);
+			outline-offset: -3px;
+		}
+	}
+
+	&__favorite {
+		position: absolute;
+		top: 12px;
+		right: 12px;
+		z-index: 1;
 	}
 
 	&__image-wrapper {
