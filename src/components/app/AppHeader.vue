@@ -1,22 +1,71 @@
 <script setup lang="ts">
-import { useCompareStore } from '../../stores/compare.ts';
-import { useFavoritesStore } from '../../stores/favorites.ts';
+import { ref, watch } from 'vue';
+import { useRoute } from 'vue-router';
+
+import { useCompareStore } from '../../stores/compare';
+import { useFavoritesStore } from '../../stores/favorites';
 import BaseContainer from '../ui/BaseContainer.vue';
+
+const route = useRoute();
 
 const favoritesStore = useFavoritesStore();
 const compareStore = useCompareStore();
+
+const mobileMenuIsOpen = ref(false);
+
+const toggleMobileMenu = () => {
+	mobileMenuIsOpen.value = !mobileMenuIsOpen.value;
+};
+
+const closeMobileMenu = () => {
+	mobileMenuIsOpen.value = false;
+};
+
+watch(
+	() => route.fullPath,
+	() => {
+		closeMobileMenu();
+	},
+);
 </script>
 
 <template>
-	<header class="app-header">
+	<header class="app-header" @keydown.esc="closeMobileMenu">
 		<BaseContainer>
 			<div class="app-header__inner">
-				<RouterLink class="app-header__logo" :to="{ name: 'home' }">
+				<RouterLink
+					class="app-header__logo"
+					:to="{ name: 'home' }"
+					@click="closeMobileMenu"
+				>
 					Shopping
 					<span>Assistant</span>
 				</RouterLink>
 
-				<nav class="app-header__nav">
+				<button
+					type="button"
+					class="app-header__burger"
+					:class="{
+						'app-header__burger--open': mobileMenuIsOpen,
+					}"
+					:aria-expanded="mobileMenuIsOpen"
+					aria-controls="main-navigation"
+					:aria-label="mobileMenuIsOpen ? 'Закрыть меню' : 'Открыть меню'"
+					@click="toggleMobileMenu"
+				>
+					<span></span>
+					<span></span>
+					<span></span>
+				</button>
+
+				<nav
+					id="main-navigation"
+					class="app-header__nav"
+					:class="{
+						'app-header__nav--open': mobileMenuIsOpen,
+					}"
+					@click="closeMobileMenu"
+				>
 					<RouterLink class="app-header__link" :to="{ name: 'home' }">
 						Главная
 					</RouterLink>
@@ -85,6 +134,7 @@ const compareStore = useCompareStore();
 		justify-content: space-between;
 		min-height: 68px;
 		gap: 32px;
+		position: relative;
 	}
 
 	&__logo {
@@ -96,6 +146,51 @@ const compareStore = useCompareStore();
 
 		span {
 			color: var(--color-primary);
+		}
+	}
+
+	&__burger {
+		display: none;
+		width: 42px;
+		height: 42px;
+		flex-shrink: 0;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 4px;
+		padding: 0;
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius-md);
+		background: var(--color-surface);
+
+		span {
+			display: block;
+			width: 20px;
+			height: 2px;
+			border-radius: 999px;
+			background: var(--color-text);
+			transition:
+				transform var(--transition-normal),
+				opacity var(--transition-normal);
+		}
+
+		&:focus-visible {
+			outline: 3px solid rgb(37 99 235 / 20%);
+			outline-offset: 2px;
+		}
+
+		&--open {
+			span:nth-child(1) {
+				transform: translateY(6px) rotate(45deg);
+			}
+
+			span:nth-child(2) {
+				opacity: 0;
+			}
+
+			span:nth-child(3) {
+				transform: translateY(-6px) rotate(-45deg);
+			}
 		}
 	}
 
@@ -150,32 +245,38 @@ const compareStore = useCompareStore();
 	@media (max-width: 700px) {
 		&__inner {
 			min-height: 60px;
+			gap: 16px;
+		}
+
+		&__burger {
+			display: flex;
 		}
 
 		&__nav {
-			gap: 0;
+			position: absolute;
+			top: calc(100% + 1px);
+			right: 0;
+			left: 0;
+			display: none;
+			flex-direction: column;
+			align-items: stretch;
+			gap: 4px;
+			padding: 12px;
+			border: 1px solid var(--color-border);
+			border-top: 0;
+			border-radius: 0 0 var(--radius-md) var(--radius-md);
+			background: rgb(255 255 255 / 98%);
+			box-shadow: var(--shadow-md);
+
+			&--open {
+				display: flex;
+			}
 		}
 
 		&__link {
-			padding: 8px;
-			font-size: 13px;
-		}
-	}
-
-	@media (max-width: 550px) {
-		&__inner {
-			flex-direction: column;
-			align-items: stretch;
-			gap: 8px;
-			padding: 10px 0;
-		}
-
-		&__logo {
-			text-align: center;
-		}
-
-		&__nav {
-			justify-content: center;
+			width: 100%;
+			justify-content: space-between;
+			padding: 12px;
 		}
 	}
 }
