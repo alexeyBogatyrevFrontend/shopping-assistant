@@ -432,9 +432,6 @@ const featureHasDifferences = (feature: ComparisonFeature) => {
 	}
 
 	&__feature-heading {
-		// position: sticky;
-		// left: 0;
-		// z-index: 2;
 		width: 180px;
 		background: var(--color-surface);
 		color: var(--color-text-secondary);
@@ -447,9 +444,6 @@ const featureHasDifferences = (feature: ComparisonFeature) => {
 	}
 
 	&__feature {
-		// position: sticky;
-		// left: 0;
-		// z-index: 1;
 		width: 180px;
 		background: inherit;
 		color: var(--color-text-secondary);
