@@ -1,8 +1,10 @@
 <script setup lang="ts">
+import { useCompareStore } from '../../stores/compare.ts';
 import { useFavoritesStore } from '../../stores/favorites.ts';
 import BaseContainer from '../ui/BaseContainer.vue';
 
 const favoritesStore = useFavoritesStore();
+const compareStore = useCompareStore();
 </script>
 
 <template>
@@ -43,8 +45,24 @@ const favoritesStore = useFavoritesStore();
 						</span>
 					</RouterLink>
 
-					<RouterLink class="app-header__link" :to="{ name: 'compare' }">
-						Сравнить
+					<RouterLink
+						class="app-header__link"
+						:to="{ name: 'compare' }"
+						:aria-label="
+							compareStore.compareCount > 0
+								? `Сравнение: ${compareStore.compareCount}`
+								: 'Сравнение'
+						"
+					>
+						<span>Сравнить</span>
+
+						<span
+							v-if="compareStore.compareCount > 0"
+							class="app-header__badge app-header__badge--compare"
+							aria-hidden="true"
+						>
+							{{ compareStore.compareCount }}
+						</span>
 					</RouterLink>
 				</nav>
 			</div>
@@ -124,6 +142,9 @@ const favoritesStore = useFavoritesStore();
 		font-size: 11px;
 		font-weight: 700;
 		line-height: 1;
+		&--compare {
+			background: var(--color-primary);
+		}
 	}
 
 	@media (max-width: 700px) {
