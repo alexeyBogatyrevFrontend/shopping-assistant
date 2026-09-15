@@ -18,11 +18,15 @@ import AppHeader from '../components/app/AppHeader.vue';
 <style scoped lang="scss">
 .default-layout {
 	display: flex;
-	flex-direction: column;
+	width: 100%;
+	min-width: 0;
 	min-height: 100vh;
+	flex-direction: column;
 
 	&__main {
 		display: flex;
+		width: 100%;
+		min-width: 0;
 		flex: 1;
 	}
 }
