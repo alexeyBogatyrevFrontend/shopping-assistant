@@ -17,6 +17,12 @@ interface FeatureTab {
 	points: string[];
 }
 
+interface FaqItem {
+	id: string;
+	question: string;
+	answer: string;
+}
+
 const featureTabs: FeatureTab[] = [
 	{
 		id: 'search',
@@ -63,6 +69,45 @@ const featureTabs: FeatureTab[] = [
 ];
 
 const activeFeatureId = ref('search');
+
+const faqItems: FaqItem[] = [
+	{
+		id: 'favorites',
+		question: 'Чем избранное отличается от сравнения?',
+		answer:
+			'Избранное хранит все понравившиеся товары, к которым вы хотите вернуться. Сравнение предназначено для одновременного сопоставления характеристик нескольких товаров.',
+	},
+	{
+		id: 'compare-limit',
+		question: 'Сколько товаров можно сравнивать одновременно?',
+		answer:
+			'Одновременно можно сравнить до четырёх товаров. Ограничение сохраняет таблицу понятной и удобной для просмотра.',
+	},
+	{
+		id: 'storage',
+		question: 'Сохранятся ли товары после перезагрузки страницы?',
+		answer:
+			'Да. Избранное и список сравнения сохраняются в localStorage вашего браузера и восстанавливаются при следующем открытии приложения.',
+	},
+	{
+		id: 'search',
+		question: 'Можно ли поделиться результатами поиска?',
+		answer:
+			'Да. Поисковая строка, выбранная категория, сортировка и текущая страница сохраняются в URL. Эту ссылку можно скопировать и открыть позднее.',
+	},
+	{
+		id: 'purchase',
+		question: 'Можно ли купить товар в этом приложении?',
+		answer:
+			'Нет. Shopping Assistant является учебным проектом для поиска, сохранения и сравнения товаров. Оформление заказа пока не реализовано.',
+	},
+];
+
+const openFaqId = ref<string | null>(null);
+
+const toggleFaq = (faqId: string) => {
+	openFaqId.value = openFaqId.value === faqId ? null : faqId;
+};
 
 const activeFeature = computed(() => {
 	return (
@@ -170,6 +215,59 @@ const activeFeature = computed(() => {
 						</div>
 					</article>
 				</BaseTabs>
+			</BaseContainer>
+		</section>
+
+		<section class="faq">
+			<BaseContainer>
+				<div class="faq__inner">
+					<div class="faq__heading">
+						<span class="faq__eyebrow">FAQ</span>
+
+						<h2 class="faq__title">Частые вопросы</h2>
+
+						<p class="faq__description">
+							Основные сведения о возможностях Shopping Assistant.
+						</p>
+					</div>
+
+					<div class="faq__list">
+						<div
+							v-for="item in faqItems"
+							:key="item.id"
+							class="faq__item"
+							:class="{
+								'faq__item--open': openFaqId === item.id,
+							}"
+						>
+							<h3 class="faq__question-heading">
+								<button
+									type="button"
+									class="faq__question"
+									:aria-expanded="openFaqId === item.id"
+									:aria-controls="`faq-answer-${item.id}`"
+									@click="toggleFaq(item.id)"
+								>
+									<span>{{ item.question }}</span>
+
+									<span class="faq__icon" aria-hidden="true">
+										{{ openFaqId === item.id ? '−' : '+' }}
+									</span>
+								</button>
+							</h3>
+
+							<Transition name="faq-answer">
+								<div
+									v-if="openFaqId === item.id"
+									:id="`faq-answer-${item.id}`"
+									class="faq__answer"
+								>
+									<p>{{ item.answer }}</p>
+								</div>
+							</Transition>
+						</div>
+					</div>
+				</div>
 			</BaseContainer>
 		</section>
 
@@ -548,6 +646,141 @@ const activeFeature = computed(() => {
 			grid-template-columns: 1fr;
 		}
 	}
+}
+
+.faq {
+	padding: 72px 0;
+	background: var(--color-background);
+
+	&__inner {
+		display: grid;
+		grid-template-columns: minmax(240px, 0.7fr) minmax(0, 1.3fr);
+		align-items: start;
+		gap: 64px;
+	}
+
+	&__heading {
+		position: sticky;
+		top: 100px;
+	}
+
+	&__eyebrow {
+		display: block;
+		margin-bottom: 10px;
+		color: var(--color-primary);
+		font-size: 13px;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.08em;
+	}
+
+	&__title {
+		margin-bottom: 12px;
+		font-size: 36px;
+		line-height: 1.2;
+		letter-spacing: -0.03em;
+	}
+
+	&__description {
+		color: var(--color-text-secondary);
+		line-height: 1.7;
+	}
+
+	&__list {
+		display: flex;
+		flex-direction: column;
+		gap: 12px;
+	}
+
+	&__item {
+		overflow: hidden;
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius-md);
+		background: var(--color-surface);
+		transition: border-color var(--transition-fast);
+
+		&--open {
+			border-color: rgb(37 99 235 / 35%);
+		}
+	}
+
+	&__question-heading {
+		font-size: inherit;
+	}
+
+	&__question {
+		display: flex;
+		width: 100%;
+		align-items: center;
+		justify-content: space-between;
+		gap: 24px;
+		padding: 20px;
+		border: 0;
+		background: transparent;
+		color: var(--color-text);
+		text-align: left;
+		font: inherit;
+		font-weight: 600;
+
+		&:hover {
+			color: var(--color-primary);
+		}
+
+		&:focus-visible {
+			outline: 3px solid rgb(37 99 235 / 20%);
+			outline-offset: -3px;
+		}
+	}
+
+	&__icon {
+		display: inline-flex;
+		width: 28px;
+		height: 28px;
+		flex-shrink: 0;
+		align-items: center;
+		justify-content: center;
+		border-radius: 50%;
+		background: rgb(37 99 235 / 10%);
+		color: var(--color-primary);
+		font-size: 20px;
+		font-weight: 400;
+	}
+
+	&__answer {
+		padding: 0 20px 20px;
+		color: var(--color-text-secondary);
+		line-height: 1.7;
+	}
+
+	@media (max-width: 750px) {
+		padding: 48px 0;
+
+		&__inner {
+			grid-template-columns: 1fr;
+			gap: 28px;
+		}
+
+		&__heading {
+			position: static;
+		}
+
+		&__title {
+			font-size: 28px;
+		}
+	}
+}
+
+.faq-answer-enter-active,
+.faq-answer-leave-active {
+	transition:
+		opacity var(--transition-normal),
+		transform var(--transition-normal);
+}
+
+.faq-answer-enter-from,
+.faq-answer-leave-to {
+	opacity: 0;
+	transform: translateY(-6px);
 }
 
 .guide {
