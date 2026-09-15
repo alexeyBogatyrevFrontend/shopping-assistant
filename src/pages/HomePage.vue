@@ -1,11 +1,75 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 
 import BaseButton from '../components/ui/BaseButton.vue';
 import BaseContainer from '../components/ui/BaseContainer.vue';
 import BaseModal from '../components/ui/BaseModal.vue';
+import BaseTabs from '../components/ui/BaseTabs.vue';
 
 const guideIsOpen = ref(false);
+
+interface FeatureTab {
+	id: string;
+	label: string;
+	icon: string;
+	title: string;
+	description: string;
+	points: string[];
+}
+
+const featureTabs: FeatureTab[] = [
+	{
+		id: 'search',
+		label: 'Поиск',
+		icon: '⌕',
+		title: 'Быстро находите подходящие товары',
+		description:
+			'Каталог помогает постепенно сузить список и оставить только подходящие варианты.',
+		points: [
+			'Поиск по названию товара',
+			'Фильтрация по категориям',
+			'Сортировка по цене, рейтингу и названию',
+			'Сохранение параметров в URL',
+		],
+	},
+	{
+		id: 'favorites',
+		label: 'Избранное',
+		icon: '♡',
+		title: 'Сохраняйте интересные варианты',
+		description:
+			'Не нужно запоминать названия или снова искать понравившийся товар.',
+		points: [
+			'Добавление из каталога и страницы товара',
+			'Отдельная страница избранного',
+			'Сохранение после перезагрузки браузера',
+			'Мгновенное обновление количества в шапке',
+		],
+	},
+	{
+		id: 'compare',
+		label: 'Сравнение',
+		icon: '⇄',
+		title: 'Сравнивайте характеристики рядом',
+		description:
+			'Добавьте несколько товаров и изучите их основные отличия в общей таблице.',
+		points: [
+			'Одновременное сравнение до четырёх товаров',
+			'Автоматическое выделение различий',
+			'Удаление отдельных вариантов',
+			'Адаптивная таблица с горизонтальной прокруткой',
+		],
+	},
+];
+
+const activeFeatureId = ref('search');
+
+const activeFeature = computed(() => {
+	return (
+		featureTabs.find(feature => feature.id === activeFeatureId.value) ??
+		featureTabs[0]!
+	);
+});
 </script>
 
 <template>
@@ -59,6 +123,53 @@ const guideIsOpen = ref(false);
 						</div>
 					</div>
 				</div>
+			</BaseContainer>
+		</section>
+
+		<section class="features">
+			<BaseContainer>
+				<div class="features__heading">
+					<span class="features__eyebrow">Возможности</span>
+
+					<h2 class="features__title">Всё необходимое для удобного выбора</h2>
+
+					<p class="features__description">
+						Пройдите путь от поиска товара до сравнения лучших вариантов.
+					</p>
+				</div>
+
+				<BaseTabs
+					v-model="activeFeatureId"
+					:items="featureTabs"
+					aria-label="Возможности сервиса"
+				>
+					<article class="feature-card">
+						<div class="feature-card__icon" aria-hidden="true">
+							{{ activeFeature.icon }}
+						</div>
+
+						<div class="feature-card__content">
+							<h3 class="feature-card__title">
+								{{ activeFeature.title }}
+							</h3>
+
+							<p class="feature-card__description">
+								{{ activeFeature.description }}
+							</p>
+
+							<ul class="feature-card__list">
+								<li
+									v-for="point in activeFeature.points"
+									:key="point"
+									class="feature-card__item"
+								>
+									<span aria-hidden="true">✓</span>
+									{{ point }}
+								</li>
+							</ul>
+						</div>
+					</article>
+				</BaseTabs>
 			</BaseContainer>
 		</section>
 
@@ -315,6 +426,126 @@ const guideIsOpen = ref(false);
 				right: 24px;
 				bottom: 24px;
 			}
+		}
+	}
+}
+
+.features {
+	padding: 72px 0;
+	background: var(--color-surface);
+
+	&__heading {
+		max-width: 680px;
+		margin: 0 auto 40px;
+		text-align: center;
+	}
+
+	&__eyebrow {
+		display: block;
+		margin-bottom: 10px;
+		color: var(--color-primary);
+		font-size: 13px;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.08em;
+	}
+
+	&__title {
+		margin-bottom: 12px;
+		font-size: 36px;
+		line-height: 1.2;
+		letter-spacing: -0.03em;
+	}
+
+	&__description {
+		color: var(--color-text-secondary);
+		font-size: 17px;
+	}
+
+	@media (max-width: 600px) {
+		padding: 48px 0;
+
+		&__heading {
+			margin-bottom: 28px;
+			text-align: left;
+		}
+
+		&__title {
+			font-size: 28px;
+		}
+	}
+}
+
+.feature-card {
+	display: grid;
+	grid-template-columns: 180px minmax(0, 1fr);
+	align-items: center;
+	gap: 40px;
+	min-height: 300px;
+	padding: 40px;
+	border: 1px solid var(--color-border);
+	border-radius: var(--radius-lg);
+	background: var(--color-background);
+
+	&__icon {
+		display: flex;
+		width: 160px;
+		height: 160px;
+		align-items: center;
+		justify-content: center;
+		border-radius: var(--radius-lg);
+		background: rgb(37 99 235 / 10%);
+		color: var(--color-primary);
+		font-size: 76px;
+		line-height: 1;
+	}
+
+	&__title {
+		margin-bottom: 12px;
+		font-size: 26px;
+		line-height: 1.3;
+	}
+
+	&__description {
+		max-width: 650px;
+		margin-bottom: 20px;
+		color: var(--color-text-secondary);
+		line-height: 1.7;
+	}
+
+	&__list {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 12px 24px;
+	}
+
+	&__item {
+		display: flex;
+		align-items: flex-start;
+		gap: 8px;
+		font-size: 14px;
+
+		span {
+			color: var(--color-success);
+			font-weight: 700;
+		}
+	}
+
+	@media (max-width: 700px) {
+		grid-template-columns: 1fr;
+		gap: 24px;
+		padding: 24px;
+
+		&__icon {
+			width: 100px;
+			height: 100px;
+			font-size: 48px;
+		}
+	}
+
+	@media (max-width: 500px) {
+		&__list {
+			grid-template-columns: 1fr;
 		}
 	}
 }

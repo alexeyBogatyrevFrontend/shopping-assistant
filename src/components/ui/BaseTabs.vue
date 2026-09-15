@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useId } from 'vue';
 
-export interface TabItem {
+interface TabItem {
 	id: string;
 	label: string;
 }
