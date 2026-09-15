@@ -5,6 +5,7 @@ import BaseButton from '../components/ui/BaseButton.vue';
 import BaseContainer from '../components/ui/BaseContainer.vue';
 import BaseModal from '../components/ui/BaseModal.vue';
 import BaseTabs from '../components/ui/BaseTabs.vue';
+import FeaturedProductsSlider from '../components/home/FeaturedProductsSlider.vue';
 
 const guideIsOpen = ref(false);
 
@@ -217,6 +218,8 @@ const activeFeature = computed(() => {
 				</BaseTabs>
 			</BaseContainer>
 		</section>
+
+		<FeaturedProductsSlider />
 
 		<section class="faq">
 			<BaseContainer>
