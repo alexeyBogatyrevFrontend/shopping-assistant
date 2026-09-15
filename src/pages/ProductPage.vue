@@ -6,10 +6,13 @@ import BaseButton from '../components/ui/BaseButton.vue';
 import { useProductsStore } from '../stores/products';
 import { useFavoritesStore } from '../stores/favorites.ts';
 import FavoriteButton from '../components/favorite/FavoriteButton.vue';
+import { useCompareStore } from '../stores/compare.ts';
+import CompareButton from '../components/compare/CompareButton.vue';
 
 const route = useRoute();
 const productsStore = useProductsStore();
 const favoritesStore = useFavoritesStore();
+const compareStore = useCompareStore();
 
 const productId = computed(() => {
 	const value = route.params.id;
@@ -39,6 +42,18 @@ const currentProductIsFavorite = computed(() => {
 	return favoritesStore.isFavorite(productsStore.product.id);
 });
 
+const currentProductIsInCompare = computed(() => {
+	if (!productsStore.product) {
+		return false;
+	}
+
+	return compareStore.isInCompare(productsStore.product.id);
+});
+
+const compareButtonIsDisabled = computed(() => {
+	return compareStore.compareIsFull && !currentProductIsInCompare.value;
+});
+
 const loadProduct = () => {
 	if (productId.value === null) {
 		productsStore.resetProduct();
@@ -56,6 +71,14 @@ const toggleCurrentProductFavorite = () => {
 	if (!productsStore.product) return;
 
 	favoritesStore.toggleFavorite(productsStore.product);
+};
+
+const toggleCurrentProductCompare = () => {
+	if (!productsStore.product) {
+		return;
+	}
+
+	compareStore.toggleCompare(productsStore.product);
 };
 
 watch(
@@ -136,11 +159,18 @@ watch(
 						{{ productsStore.product.availabilityStatus }}
 					</div>
 
-					<FavoriteButton
-						class="product__favorite"
-						:is-favorite="currentProductIsFavorite"
-						@toggle="toggleCurrentProductFavorite"
-					/>
+					<div class="product__actions">
+						<FavoriteButton
+							:is-favorite="currentProductIsFavorite"
+							@toggle="toggleCurrentProductFavorite"
+						/>
+
+						<CompareButton
+							:is-in-compare="currentProductIsInCompare"
+							:disabled="compareButtonIsDisabled"
+							@toggle="toggleCurrentProductCompare"
+						/>
+					</div>
 				</div>
 			</article>
 		</div>
@@ -187,7 +217,10 @@ watch(
 	border: 1px solid var(--color-border);
 	border-radius: var(--radius-lg);
 	box-shadow: var(--shadow-sm);
-	&__favorite {
+	&__actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 12px;
 		margin-top: 24px;
 	}
 	&__image-wrapper {

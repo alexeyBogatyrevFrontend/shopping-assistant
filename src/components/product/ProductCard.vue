@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
+import CompareButton from '../compare/CompareButton.vue';
 import FavoriteButton from '../favorite/FavoriteButton.vue';
+import { useCompareStore } from '../../stores/compare';
 import { useFavoritesStore } from '../../stores/favorites';
 import type { Product } from '../../types/product';
 
@@ -10,13 +12,26 @@ const props = defineProps<{
 }>();
 
 const favoritesStore = useFavoritesStore();
+const compareStore = useCompareStore();
 
 const productIsFavorite = computed(() => {
 	return favoritesStore.isFavorite(props.product.id);
 });
 
+const productIsInCompare = computed(() => {
+	return compareStore.isInCompare(props.product.id);
+});
+
+const compareButtonIsDisabled = computed(() => {
+	return compareStore.compareIsFull && !productIsInCompare.value;
+});
+
 const toggleFavorite = () => {
 	favoritesStore.toggleFavorite(props.product);
+};
+
+const toggleCompare = () => {
+	compareStore.toggleCompare(props.product);
 };
 </script>
 
@@ -62,6 +77,14 @@ const toggleFavorite = () => {
 			compact
 			@toggle="toggleFavorite"
 		/>
+
+		<CompareButton
+			class="product-card__compare"
+			:is-in-compare="productIsInCompare"
+			:disabled="compareButtonIsDisabled"
+			compact
+			@toggle="toggleCompare"
+		/>
 	</article>
 </template>
 
@@ -102,6 +125,13 @@ const toggleFavorite = () => {
 	&__favorite {
 		position: absolute;
 		top: 12px;
+		right: 12px;
+		z-index: 1;
+	}
+
+	&__compare {
+		position: absolute;
+		top: 60px;
 		right: 12px;
 		z-index: 1;
 	}
