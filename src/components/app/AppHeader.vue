@@ -32,7 +32,7 @@ const favoritesStore = useFavoritesStore();
 								: 'Избранное'
 						"
 					>
-						<span>Favorites</span>
+						<span>Избранное</span>
 
 						<span
 							v-if="favoritesStore.favoritesCount > 0"
