@@ -1,5 +1,51 @@
-# Vue 3 + TypeScript + Vite
+# Shopping Assistant
 
-This template should help get you started developing with Vue 3 and TypeScript in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+Приложение для поиска, сохранения и сравнения товаров.
 
-Learn more about the recommended Project Setup and IDE Support in the [Vue Docs TypeScript Guide](https://vuejs.org/guide/typescript/overview.html#project-setup).
+Проект создан на Vue 3, TypeScript, Pinia и Vue Router. Данные товаров загружаются из DummyJSON API.
+
+## Возможности
+
+- каталог товаров;
+- поиск с debounce;
+- фильтрация по категориям;
+- сортировка по цене, рейтингу и названию;
+- пагинация;
+- синхронизация параметров каталога с URL;
+- отдельная страница товара;
+- избранные товары;
+- сравнение до четырёх товаров;
+- сохранение избранного и сравнения в localStorage;
+- выделение различающихся характеристик;
+- slider популярных товаров;
+- modal, tabs и accordion;
+- адаптивное burger menu;
+- обработка loading, error и empty-состояний;
+- страница 404;
+- unit-тесты stores и Vue-компонента.
+
+## Технологии
+
+- Vue 3
+- TypeScript
+- Vite
+- Pinia
+- Vue Router
+- Axios
+- Swiper
+- Sass
+- Vitest
+- Vue Test Utils
+- jsdom
+
+## API
+
+Проект использует публичный API:
+
+- https://dummyjson.com
+
+## Установка
+
+```bash
+npm install
+```
