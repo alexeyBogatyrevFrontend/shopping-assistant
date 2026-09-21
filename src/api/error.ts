@@ -36,12 +36,11 @@ export const getRequestError = (error: unknown): RequestError => {
 		};
 	}
 
-	if (status) {
-		if (status >= 500)
-			return {
-				message: 'На сервере произошла ошибка. Попробуйте позже',
-				status,
-			};
+	if (status && status >= 500) {
+		return {
+			message: 'На сервере произошла ошибка. Попробуйте позже',
+			status,
+		};
 	}
 
 	return {

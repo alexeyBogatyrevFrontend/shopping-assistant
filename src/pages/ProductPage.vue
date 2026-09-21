@@ -4,9 +4,9 @@ import { useRoute } from 'vue-router';
 
 import BaseButton from '../components/ui/BaseButton.vue';
 import { useProductsStore } from '../stores/products';
-import { useFavoritesStore } from '../stores/favorites.ts';
+import { useFavoritesStore } from '../stores/favorites';
 import FavoriteButton from '../components/favorite/FavoriteButton.vue';
-import { useCompareStore } from '../stores/compare.ts';
+import { useCompareStore } from '../stores/compare';
 import CompareButton from '../components/compare/CompareButton.vue';
 
 const route = useRoute();

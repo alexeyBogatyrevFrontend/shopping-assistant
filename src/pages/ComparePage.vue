@@ -4,7 +4,7 @@ import { computed } from 'vue';
 import BaseButton from '../components/ui/BaseButton.vue';
 import BaseContainer from '../components/ui/BaseContainer.vue';
 import { useCompareStore } from '../stores/compare';
-import type { Product } from '../types/product.ts';
+import type { Product } from '../types/product';
 
 interface ComparisonFeature {
 	key: string;

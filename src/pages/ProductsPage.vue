@@ -4,7 +4,7 @@ import BaseContainer from '../components/ui/BaseContainer.vue';
 import ProductList from '../components/product/ProductList.vue';
 import ProductPagination from '../components/product/ProductPagination.vue';
 import ProductsToolbar from '../components/product/ProductsToolbar.vue';
-import { useProductsQuery } from '../composables/useProductsQuery.ts';
+import { useProductsQuery } from '../composables/useProductsQuery';
 import ProductCategoryFilter from '../components/product/ProductCategoryFilter.vue';
 import { computed } from 'vue';
 import ProductSort from '../components/product/ProductSort.vue';

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Product } from '../../types/product.ts';
+import type { Product } from '../../types/product';
 import ProductCard from './ProductCard.vue';
 
 defineProps<{
